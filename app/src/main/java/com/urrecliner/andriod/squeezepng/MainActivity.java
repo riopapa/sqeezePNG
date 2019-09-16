@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button btn01 = findViewById(R.id.button01);
-        btn01.setText("칼라 clickDumpSource");
+        btn01.setText("clickDumpSource");
         btn01.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
