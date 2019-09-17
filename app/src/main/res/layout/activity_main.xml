@@ -87,49 +87,9 @@
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button05"
-        android:text="button02"
-        app:layout_constraintTop_toBottomOf="@id/button04"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_margin="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/button06"
-        android:text="button02"
-        app:layout_constraintTop_toBottomOf="@id/button05"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_margin="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/button07"
-        android:text="button02"
-        app:layout_constraintTop_toBottomOf="@id/button06"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_margin="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/button08"
-        android:text="button02"
-        app:layout_constraintTop_toBottomOf="@id/button07"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_margin="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
         android:id="@+id/button09"
         android:text="button02"
-        app:layout_constraintTop_toBottomOf="@id/button08"
+        app:layout_constraintTop_toBottomOf="@id/button04"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="5dp"

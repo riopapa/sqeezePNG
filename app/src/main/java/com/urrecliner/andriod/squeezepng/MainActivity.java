@@ -11,9 +11,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import static com.urrecliner.andriod.squeezepng.Vars.currActivity;
 import static com.urrecliner.andriod.squeezepng.Vars.mainContext;
@@ -30,18 +27,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sourceFolder = new File(Environment.getExternalStorageDirectory(), "@hymngasa");
-//        sourceFolder = new File(Environment.getExternalStorageDirectory(), "@Input");
-        targetFolder = new File(Environment.getExternalStorageDirectory(), "myHolyBible/hymn_png");
+//        sourceFolder = new File(Environment.getExternalStorageDirectory(), "@hymngasa");
+        sourceFolder = new File(Environment.getExternalStorageDirectory(), "@Input");
+//        targetFolder = new File(Environment.getExternalStorageDirectory(), "myHolyBible/hymn_png");
+        targetFolder = new File(Environment.getExternalStorageDirectory(), "@Output");
         utils = new Utils();
         currActivity = this;
         mainContext = this;
         tVNowFile = findViewById(R.id.text1);
         tVText2 = findViewById(R.id.text2);
         tVText3 = findViewById(R.id.text3);
+        tVText3.setText(sourceFolder.getName()+" => "+targetFolder.getName());
 
         Button btn00 = findViewById(R.id.button00);
-        btn00.setText("빈 가로라인 없애기 + 투명화");
+        btn00.setText("투명화 후 빈 가로라인 없애기");
         btn00.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
                 clickDumpSource();
             }
         });
-        final SimpleDateFormat timeLogFormat = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.ENGLISH);
-        String s = timeLogFormat.format(new Date());
-        long timel = System.currentTimeMillis();
-        clickButton00();
+//        final SimpleDateFormat timeLogFormat = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.ENGLISH);
+//        String s = timeLogFormat.format(new Date());
+//        long timel = System.currentTimeMillis();
+////        clickButton00();
 //        clickDumpSource();
-        s += " >> "+timeLogFormat.format(new Date())+ "\nElapsed sec "+(System.currentTimeMillis()-timel)/60000;
-        tVText2.setText(s);
+//        s += " >> "+timeLogFormat.format(new Date())+ "\nElapsed sec "+(System.currentTimeMillis()-timel)/60000;
+//        tVText2.setText(s);
     }
 
     private void clickButton00() {
@@ -162,18 +161,21 @@ public class MainActivity extends AppCompatActivity {
         int outYp = 0;
         int yStart = -1;
         Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
-
-        for (int yp = 130; yp < ySize; yp++) {
+        tVText2.setText(tVText2.getText().toString()+" "+nowName);
+        for (int yp = 110; yp < ySize; yp++) {
+            // 110 start : 241, 311
             StringBuilder oneLine = new StringBuilder();
             for (int xp = 0; xp < xSize; xp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
                 switch (nowColor) {
+
                     case 0xFFFFEFEF:
                     case 0xFFFFDFDF:
                     case 0xFFFFD8D8:
                     case 0xFFFFD7D7:
                     case 0xFFFFCFCF:
                     case 0xFFFFBFBF:
+                    case 0xFFFFBEBE:
                     case 0xFFFFBDBD:
                     case 0xFFFFBCBC:
                     case 0xFFFFAFAF:
@@ -195,11 +197,14 @@ public class MainActivity extends AppCompatActivity {
                     case 0xFFFF7070:
                     case 0xFFFF6060:
                     case 0xFFFF5050:
+                    case 0xFFFF4444:
                     case 0xFFFF4343:
                     case 0xFFFF4242:
+                    case 0xFFFF4141:
                     case 0xFFFF4040:
                     case 0xFFFF3E3E:
                     case 0xFFFF3030:
+                    case 0xFFFF2A2A:
                     case 0xFFFF2929:
                     case 0xFFFF2828:
                     case 0xFFFF2727:
@@ -211,8 +216,11 @@ public class MainActivity extends AppCompatActivity {
                     case 0xFFFF0101:
                     case 0xFFFF0000:
                     case 0xFFFE2727:
+                    case 0xFFFE2020:
+                    case 0xFFFE1010:
                     case 0xFFFE0E0E:
                     case 0xFFFE0707:
+                    case 0xFFFE0000:
                     case 0xFFFD1616:
                     case 0xFFFD0A0A:
                     case 0xFFFC0D0D:
@@ -295,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
                     case 0xFF777777:
                     case 0xFF686868:
 
+
                         if (yStart == -1) {
 //                            utils.appendText("yp "+yp+" xp "+xp+" "+String.format("#%08X",nowColor));
                             yStart = yp;
@@ -342,57 +351,6 @@ public class MainActivity extends AppCompatActivity {
         }
         utils.appendText("Dump Finish, "+nowName+",_,_,_,_,_,_,_,_,_,_,_,_");
         return outMap;
-    }
-
-    private int getTgtY(Bitmap inpMap, int xSize, int ySize, int tgtY, int dupBar) {
-        Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
-        for (int yp = 0; yp < ySize; yp++) {
-            int barX = 0;
-            int nonZero = 0;
-            boolean barBar = true;
-//                        Log.w("y", "" + yp);
-            StringBuilder oneLine = new StringBuilder();
-            for (int xp = 0; xp < xSize; xp++) {
-                int nowColor = inpMap.getPixel(xp, yp);
-                outMap.setPixel(xp, tgtY, nowColor);
-
-                if (nowColor != 0) {
-                    nonZero++;
-                    if (barX == 0) {
-                        barX = xp;
-//                                    Log.w("barX line " + yp, " " + barX);
-                    }
-//                                int redValue = Color.red(nowColor);
-//                                oneLine.append(String.format("#%02X", redValue));
-//                                int blueValue = Color.blue(nowColor);
-//                                oneLine.append(String.format("#%02X", blueValue));
-//                                int greenValue = Color.green(nowColor);
-//                                oneLine.append(String.format("#%02X", greenValue));
-//                                oneLine.append(" ");
-                    if (xp > 25)
-                        barBar = false;
-                } else {
-//                                oneLine.append("0 ");
-//                                if (barX != 0) {
-//                                    if (nowColor != colorSave) {
-//                                        colorChanged++;
-//                                        colorSave = nowColor;
-//                                    }
-//                                }
-                }
-            }
-            if (!barBar) {
-                dupBar = 0;
-                tgtY++;
-            }
-            else {
-                if (dupBar == 0)
-                    tgtY++;
-                dupBar++;
-//                            Log.w("delete "+yp," line");
-            }
-        }
-        return tgtY;
     }
 
 }
