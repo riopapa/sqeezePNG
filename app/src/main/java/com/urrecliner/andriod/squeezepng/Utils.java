@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.util.Log;
 
@@ -43,7 +44,7 @@ class Utils {
         BufferedWriter bw = null;
         FileWriter fw = null;
         try {
-            File file = new File(directory, PREFIX + dateFormat.format(new Date())+".txt");
+            File file = new File(directory, PREFIX + dateFormat.format(new Date())+".csv");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
                     Log.e("createFile", " Error");
@@ -124,7 +125,11 @@ class Utils {
         return fullPath.listFiles();
     }
 
-
+    void deleteLogFile() {
+        File directory = utils.getPackageDirectory();
+        File file = new File(directory, PREFIX + dateFormat.format(new Date())+".txt");
+        file.delete();
+    }
 
     void writeBitMap(Bitmap outMap, File targetFile) {
         FileOutputStream os;
@@ -138,4 +143,10 @@ class Utils {
         }
     }
 
+    void sayFinished() {
+        MediaPlayer mp = new MediaPlayer();
+        mp = MediaPlayer.create(mainContext, R.raw.inform);
+        mp.start();
+
+    }
 }

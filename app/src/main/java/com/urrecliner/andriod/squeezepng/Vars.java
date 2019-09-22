@@ -11,5 +11,7 @@ public class Vars {
 
     static Bitmap bitMapScreen;
     static Utils utils;
+    static String nowName;
+
 
 }

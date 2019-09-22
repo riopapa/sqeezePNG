@@ -8,7 +8,9 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -21,12 +23,14 @@ public class MainActivity extends AppCompatActivity {
     static File sourceFolder, targetFolder, sourceFile, targetFile;
     String nowName;
     String [] currFiles;
-    TextView tVNowFile, tVText2, tVText3;
+    TextView tvText1, tVText2, tVText3;
+    int whiteColor = 0xffffffff, blackColor = 0xff000000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 //        sourceFolder = new File(Environment.getExternalStorageDirectory(), "@hymngasa");
         sourceFolder = new File(Environment.getExternalStorageDirectory(), "@Input");
 //        targetFolder = new File(Environment.getExternalStorageDirectory(), "myHolyBible/hymn_png");
@@ -34,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         utils = new Utils();
         currActivity = this;
         mainContext = this;
-        tVNowFile = findViewById(R.id.text1);
+        tvText1 = findViewById(R.id.text1);
         tVText2 = findViewById(R.id.text2);
         tVText3 = findViewById(R.id.text3);
         tVText3.setText(sourceFolder.getName()+" => "+targetFolder.getName());
@@ -58,13 +62,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         Button btn02 = findViewById(R.id.button02);
         btn02.setText("jpg 2 png");
         btn02.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 clickDumpSource();
+            }
+        });
+
+        String s = "Patial Dump at position";
+        final Button btn03 = findViewById(R.id.button03);
+        btn03.setText(s);
+        btn03.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText et = findViewById(R.id.input1);
+                int xBase = Integer.parseInt(et.getText().toString());
+                et = findViewById(R.id.input2);
+                int yBase = Integer.parseInt(et.getText().toString());
+                et = findViewById(R.id.input3);
+                int delta = Integer.parseInt(et.getText().toString());
+                btn03.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+                clickDumpSourcePartial(xBase, yBase, delta);
+                btn03.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+
+            }
+        });
+
+        final Button brighterDarker = findViewById(R.id.button04);
+        String s4 = "04 더 하얗게, 더 까맣게 ";
+        brighterDarker.setText(s4);
+        brighterDarker.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                clickDumpSource();
+
+                brighterDarker.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+                String nowFile;
+                Bitmap inpMap, outMap;
+                currFiles = utils.getCurrentFileNames(sourceFolder);
+
+                for (int idx = 0; idx < currFiles.length; idx++) {
+                    nowFile = currFiles[idx];
+                    sourceFile = new File(sourceFolder, nowFile);
+                    nowName = sourceFile.getName();
+                    targetFile = new File(targetFolder, nowName);
+                    utils.appendText(" target ------- "+targetFile);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath(), options);
+                    outMap = removeLightGrayColor(inpMap);
+                    utils.writeBitMap(outMap, targetFile);
+//                    utils.deleteLogFile();
+//                    for (int yp = 2000; yp < 4000; yp++)  {
+//                        String s = ",";
+//                        for (int xp = 2000; xp < 4000; xp++) {
+//                            if (inpMap.getPixel(xp,yp) == outMap.getPixel(xp,yp))
+//                                s = s + "XX,";
+//                            else
+//                                s = s + ",";
+//                        }
+//                        utils.appendText(s);
+//                    }
+
+                }
+                tvText1.setText("Done..");
+                utils.appendText("Done");
+                utils.sayFinished();
+                brighterDarker.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            }
+        });
+
+        Button btn09 = findViewById(R.id.button09);
+        btn09.setText("deleteLogFile");
+        btn09.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                utils.deleteLogFile();
+                Toast.makeText(mainContext," log deleted",Toast.LENGTH_LONG).show();
             }
         });
 //        final SimpleDateFormat timeLogFormat = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.ENGLISH);
@@ -101,23 +177,44 @@ public class MainActivity extends AppCompatActivity {
             outMap = removeBlankNorLine(outMap);
             utils.writeBitMap(outMap, targetFile);
         }
-        tVNowFile.setText("Done..");
+        tvText1.setText("Done..");
         utils.appendText("Done");
     }
+
     private void clickDumpSource() {
         Bitmap inpMap, outMap;
         Matrix matrix = new Matrix();
         currFiles = utils.getCurrentFileNames(sourceFolder);
-
+        utils.deleteLogFile();
         for (int idx = 0; idx < currFiles.length; idx++) {
             nowName = currFiles[idx];
+            tVText2.setText(tVText2.getText().toString()+" "+nowName);
             sourceFile = new File(sourceFolder, nowName);
-            targetFile = new File(targetFolder, nowName+"z");
+            targetFile = new File(targetFolder, nowName);
             inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
 //            Bitmap outMap = removeRedColor(inpMap);
-            outMap = dumpSourceMap(inpMap);
+            SourceDump.dumpSourceMap(inpMap);
 //            utils.writeBitMap(outMap, targetFile);
         }
+        Toast.makeText(mainContext," source Dumped",Toast.LENGTH_LONG).show();
+    }
+
+    private void clickDumpSourcePartial(int xBase, int yBase, int delta) {
+        Bitmap inpMap;
+        currFiles = utils.getCurrentFileNames(sourceFolder);
+        utils.deleteLogFile();
+        for (int idx = 0; idx < currFiles.length; idx++) {
+            nowName = currFiles[idx];
+            tVText2.setText(tVText2.getText().toString()+" "+nowName);
+            sourceFile = new File(sourceFolder, nowName);
+            targetFile = new File(targetFolder, nowName);
+            inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
+            SourceDump.dumpSourceMapPartial(inpMap, xBase, yBase, delta);
+            tvText1.setText(nowName+" Done..");
+            tvText1.invalidate();
+        }
+        Toast.makeText(mainContext," source partial Dumped (X: "+xBase+", Y: "+yBase+")" ,Toast.LENGTH_LONG).show();
+        utils.sayFinished();
     }
 
     private Bitmap removeBlankNorLine(Bitmap inpMap) {
@@ -154,6 +251,48 @@ public class MainActivity extends AppCompatActivity {
         return Bitmap.createBitmap(outMap, 0, 0, xSize, tgtY, matrix, false);
     }
 
+
+    private Bitmap removeLightGrayColor(Bitmap inpMap) {
+        Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
+        int xSize = inpMap.getWidth();
+        int ySize = inpMap.getHeight();
+        int whiteCnt = 0, blackCnt = 0, whiteNear = 0, blackNear = 0, noneCnt = 0;
+
+        for (int yp = 0; yp < ySize; yp++) {
+            for (int xp = 0; xp < xSize; xp++) {
+                int nowColor = inpMap.getPixel(xp, yp);
+
+                if (ColorDetect.isNearWhite(nowColor)) {
+                    nowColor = whiteColor;
+                    whiteNear++;
+                }
+                else if (ColorDetect.isNearBlack(nowColor)) {
+                    nowColor = blackColor;
+                    blackNear++;
+                }
+                else {
+                    int redC = nowColor & 0xFF0000;
+                    int greenC = nowColor & 0xFF00;
+                    int blueC = nowColor & 0xFF;
+
+                    if (redC < 0x800000 & greenC < 0x8000 & blueC < 0x80) {
+                        nowColor = blackColor;
+                        blackCnt++;
+                    } else if (redC > 0xD00000 & greenC > 0xD000 & blueC > 0xD0) {
+                        nowColor = whiteColor;
+                        whiteCnt++;
+                    } else {
+                        nowColor = 0;
+                        noneCnt++;
+                    }
+                }
+                outMap.setPixel(xp, yp, nowColor);
+            }
+        }
+            utils.appendText("whiteCnt="+whiteCnt+" blackCnt="+blackCnt+" whiteNear="+whiteNear+" blackNear="+blackNear+" none="+noneCnt);
+        return outMap;
+    }
+
     private Bitmap removeRedColor(Bitmap inpMap) {
         int xSize = inpMap.getWidth();
         int ySize = inpMap.getHeight();
@@ -162,159 +301,20 @@ public class MainActivity extends AppCompatActivity {
         int yStart = -1;
         Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
         tVText2.setText(tVText2.getText().toString()+" "+nowName);
-        for (int yp = 110; yp < ySize; yp++) {
-            // 110 start : 241, 311
+        for (int yp = 110; yp < ySize; yp++) {  // 120 is normal for hymn
+            // 110 start : 241, 311 hymn
+
             StringBuilder oneLine = new StringBuilder();
             for (int xp = 0; xp < xSize; xp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
-                switch (nowColor) {
-
-                    case 0xFFFFEFEF:
-                    case 0xFFFFDFDF:
-                    case 0xFFFFD8D8:
-                    case 0xFFFFD7D7:
-                    case 0xFFFFCFCF:
-                    case 0xFFFFBFBF:
-                    case 0xFFFFBEBE:
-                    case 0xFFFFBDBD:
-                    case 0xFFFFBCBC:
-                    case 0xFFFFAFAF:
-                    case 0xFFFF9F9F:
-                    case 0xFFFF9A9A:
-                    case 0xFFFF9999:
-                    case 0xFFFF9898:
-                    case 0xFFFF9797:
-                    case 0xFFFF8F8F:
-                    case 0xFFFF8282:
-                    case 0xFFFF8181:
-                    case 0xFFFF8080:
-                    case 0xFFFF7F7F:
-                    case 0xFFFF7E7E:
-                    case 0xFFFF7D7D:
-                    case 0xFFFF7C7C:
-                    case 0xFFFF7979:
-                    case 0xFFFF7777:
-                    case 0xFFFF7070:
-                    case 0xFFFF6060:
-                    case 0xFFFF5050:
-                    case 0xFFFF4444:
-                    case 0xFFFF4343:
-                    case 0xFFFF4242:
-                    case 0xFFFF4141:
-                    case 0xFFFF4040:
-                    case 0xFFFF3E3E:
-                    case 0xFFFF3030:
-                    case 0xFFFF2A2A:
-                    case 0xFFFF2929:
-                    case 0xFFFF2828:
-                    case 0xFFFF2727:
-                    case 0xFFFF2626:
-                    case 0xFFFF2020:
-                    case 0xFFFF1010:
-                    case 0xFFFF0303:
-                    case 0xFFFF0202:
-                    case 0xFFFF0101:
-                    case 0xFFFF0000:
-                    case 0xFFFE2727:
-                    case 0xFFFE2020:
-                    case 0xFFFE1010:
-                    case 0xFFFE0E0E:
-                    case 0xFFFE0707:
-                    case 0xFFFE0000:
-                    case 0xFFFD1616:
-                    case 0xFFFD0A0A:
-                    case 0xFFFC0D0D:
-                    case 0xFFFBFBFB:
-                    case 0xFFFBFAFA:
-                    case 0xFFFAFAFA:
-                    case 0xFFF9F3F3:
-                    case 0xFFF9F2F2:
-                    case 0xFFF92F2F:
-                    case 0xFFF84949:
-                    case 0xFFF7F1F1:
-                    case 0xFFF79696:
-                    case 0xFFF6F6F6:
-                    case 0xFFF6ECEC:
-                    case 0xFFF6EAEA:
-                    case 0xFFF6E9E9:
-                    case 0xFFF6E2E2:
-                    case 0xFFF6CBCB:
-                    case 0xFFF69696:
-                    case 0xFFF67474:
-                    case 0xFFF65151:
-                    case 0xFFF64A4A:
-                    case 0xFFF5F5F5:
-                    case 0xFFF5E5E5:
-                    case 0xFFF5E1E1:
-                    case 0xFFF5DBDB:
-                    case 0xFFF4CCCC:
-                    case 0xFFF3DBDB:
-                    case 0xFFF2D0D0:
-                    case 0xFFF27171:
-                    case 0xFFF1F1F1:
-                    case 0xFFF1F0F0:
-                    case 0xFFF1DEDE:
-                    case 0xFFF1CDCD:
-                    case 0xFFF1B3B3:
-                    case 0xFFF16F6F:
-                    case 0xFFF14444:
-                    case 0xFFF0D0D0:
-                    case 0xFFEF7272:
-                    case 0xFFECEBEB:
-                    case 0xFFEC9F9F:
-                    case 0xFFEBEBEB:
-                    case 0xFFEBEAEA:
-                    case 0xFFEBAAAA:
-                    case 0xFFEB9696:
-                    case 0xFFEB7474:
-                    case 0xFFEAEAEA:
-                    case 0xFFEAB8B8:
-                    case 0xFFE7B5B5:
-                    case 0xFFE6E6E6:
-                    case 0xFFE4E4E4:
-                    case 0xFFE3E3E3:
-                    case 0xFFE3B8B8:
-                    case 0xFFE1E1E1:
-                    case 0xFFDDDDDD:
-                    case 0xFFDCDCDC:
-                    case 0xFFDCDBDB:
-                    case 0xFFDBDBDB:
-                    case 0xFFDADADA:
-                    case 0xFFD8D7D7:
-                    case 0xFFD6D6D6:
-                    case 0xFFD3D3D3:
-                    case 0xFFD2D1D1:
-                    case 0xFFD1D0D0:
-                    case 0xFFCF9999:
-                    case 0xFFCD9797:
-                    case 0xFFCCCCCC:
-                    case 0xFFCB8B8B:
-                    case 0xFFC9C9C9:
-                    case 0xFFC7C7C7:
-                    case 0xFFC3C3C3:
-                    case 0xFFC0C0C0:
-                    case 0xFFBDBDBD:
-                    case 0xFFBABABA:
-                    case 0xFFAEAEAE:
-                    case 0xFFA4A4A4:
-                    case 0xFF9C9C9C:
-                    case 0xFF939393:
-                    case 0xFF868686:
-                    case 0xFF777777:
-                    case 0xFF686868:
-
-
-                        if (yStart == -1) {
-//                            utils.appendText("yp "+yp+" xp "+xp+" "+String.format("#%08X",nowColor));
-                            yStart = yp;
-                        }
-                        nowColor = 0;
-                        break;
-                    default:
+                if (ColorDetect.isRedColor(nowColor)) {
+                    if (yStart == -1) {
+                        yStart = yp;
+                    }
+                    nowColor = 0;
                 }
                 outMap.setPixel(xp, outYp, nowColor);
             }
-//            outMap.setPixel(outYp,outYp, 0xFF345678);
             if (yStart != -1) {
                 outYp++;
             }
@@ -328,33 +328,5 @@ public class MainActivity extends AppCompatActivity {
         return Bitmap.createBitmap(outMap, 0, 0, xSize, outYp, matrix, false);
     }
 
-    private Bitmap dumpSourceMap(Bitmap inpMap) {
-        int xSize = inpMap.getWidth();
-        int ySize = inpMap.getHeight();
-        int tgtY = 0;
-        Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
-        utils.appendText("Dump start, "+nowName+",_,_,_,_,_,_,_,_,_,_,_,_");
-        for (int yp = 0; yp < ySize; yp++) {
-            StringBuilder oneLine = new StringBuilder();
-            for (int xp = 0; xp < xSize; xp++) {
-                int nowColor = inpMap.getPixel(xp, yp);
-                if (nowColor == 0) {
-                    oneLine.append(",");
-                } else {
-                    oneLine.append(String.format("#%08X", nowColor & 0xffffffff));
-                    oneLine.append(",");
-                }
-                outMap.setPixel(xp, tgtY, nowColor);
-            }
-            tgtY++;
-            utils.appendText(yp+": " +oneLine.toString());
-        }
-        utils.appendText("Dump Finish, "+nowName+",_,_,_,_,_,_,_,_,_,_,_,_");
-        return outMap;
-    }
-
 }
-//                                if (redValue == 255) {
-//                                        tgtMap.setPixel(xp, tgtY, Color.TRANSPARENT);
-//                                        nowColor = 0;
-//                                        oneLine.append("0 ");
+

@@ -36,10 +36,48 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
+    <EditText
+        android:id="@+id/input1"
+        android:layout_width="60sp"
+        android:layout_height="wrap_content"
+        android:tooltipText="123"
+        android:inputType="number"
+        android:background="#e1bee7"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/text3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <EditText
+        android:id="@+id/input2"
+        android:layout_width="60sp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:background="#e1bee7"
+        android:tooltipText="123"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/text3"
+        app:layout_constraintLeft_toRightOf="@id/input1"
+        app:layout_constraintRight_toLeftOf="@id/input3" />
+
+
+    <EditText
+        android:id="@+id/input3"
+        android:layout_width="60sp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:background="#e1bee7"
+        android:text="50"
+        android:tooltipText="size"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/text3"
+        app:layout_constraintLeft_toRightOf="@id/input2"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <Button
         android:id="@+id/button00"
-        android:text="button00"
-        app:layout_constraintTop_toBottomOf="@id/text3"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/input2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="5dp"
@@ -48,7 +86,7 @@
 
     <Button
         android:id="@+id/button01"
-        android:text="button01"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/button00"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -58,7 +96,7 @@
     
     <Button
         android:id="@+id/button02"
-        android:text="button02"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/button01"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -68,7 +106,7 @@
 
     <Button
         android:id="@+id/button03"
-        android:text="button02"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/button02"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -78,7 +116,7 @@
 
     <Button
         android:id="@+id/button04"
-        android:text="button02"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/button03"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -87,9 +125,29 @@
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button09"
-        android:text="button02"
+        android:id="@+id/button05"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/button04"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button06"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/button05"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button09"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/button06"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="5dp"
