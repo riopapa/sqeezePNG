@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.urrecliner.andriod.squeezepng.Vars.currActivity;
 import static com.urrecliner.andriod.squeezepng.Vars.mainContext;
@@ -22,9 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     static File sourceFolder, targetFolder, sourceFile, targetFile;
     String nowName;
-    String [] currFiles;
-    TextView tvText1, tVText2, tVText3;
-    int whiteColor = 0xffffffff, blackColor = 0xff000000;
+    TextView tVText2, tVText3;
+    static TextView tvProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         utils = new Utils();
         currActivity = this;
         mainContext = this;
-        tvText1 = findViewById(R.id.text1);
+        utils.appendText("Start with "+sourceFolder.toString()+" > "+targetFolder.toString());
+        tvProgress = findViewById(R.id.progress);
         tVText2 = findViewById(R.id.text2);
         tVText3 = findViewById(R.id.text3);
         tVText3.setText(sourceFolder.getName()+" => "+targetFolder.getName());
@@ -83,55 +85,47 @@ public class MainActivity extends AppCompatActivity {
                 int yBase = Integer.parseInt(et.getText().toString());
                 et = findViewById(R.id.input3);
                 int delta = Integer.parseInt(et.getText().toString());
-                btn03.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+                btn03.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark,mainContext.getTheme()));
                 clickDumpSourcePartial(xBase, yBase, delta);
-                btn03.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                btn03.setBackgroundColor(getResources().getColor(android.R.color.darker_gray,mainContext.getTheme()));
 
             }
         });
 
-        final Button brighterDarker = findViewById(R.id.button04);
+        final Button btn04 = findViewById(R.id.button04);
         String s4 = "04 더 하얗게, 더 까맣게 ";
-        brighterDarker.setText(s4);
-        brighterDarker.setOnClickListener(new Button.OnClickListener() {
+        btn04.setText(s4);
+        btn04.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                clickDumpSource();
 
-                brighterDarker.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
-                String nowFile;
-                Bitmap inpMap, outMap;
-                currFiles = utils.getCurrentFileNames(sourceFolder);
-
-                for (int idx = 0; idx < currFiles.length; idx++) {
-                    nowFile = currFiles[idx];
-                    sourceFile = new File(sourceFolder, nowFile);
-                    nowName = sourceFile.getName();
-                    targetFile = new File(targetFolder, nowName);
-                    utils.appendText(" target ------- "+targetFile);
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath(), options);
-                    outMap = removeLightGrayColor(inpMap);
-                    utils.writeBitMap(outMap, targetFile);
-//                    utils.deleteLogFile();
-//                    for (int yp = 2000; yp < 4000; yp++)  {
-//                        String s = ",";
-//                        for (int xp = 2000; xp < 4000; xp++) {
-//                            if (inpMap.getPixel(xp,yp) == outMap.getPixel(xp,yp))
-//                                s = s + "XX,";
-//                            else
-//                                s = s + ",";
-//                        }
-//                        utils.appendText(s);
-//                    }
-
-                }
-                tvText1.setText("Done..");
-                utils.appendText("Done");
-                utils.sayFinished();
-                brighterDarker.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+                btn04.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark,mainContext.getTheme()));
+                new Timer().schedule(new TimerTask() {
+                    public void run () {
+                        LightGrayColor.loop_removeLightGrayColor();
+                        btn04.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light,mainContext.getTheme()));
+                    }
+                }, 0);
             }
+        });
+
+        final Button btn05 = findViewById(R.id.button05);
+        String s5 = "05 vertical 라인 remove ";
+        btn05.setText(s5);
+        btn05.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                btn05.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark,mainContext.getTheme()));
+                new Timer().schedule(new TimerTask() {
+                    public void run () {
+                        VerticalDup.loop_removeVerticalDup();
+                        btn05.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light,mainContext.getTheme()));
+                    }
+                }, 0);
+            }
+
         });
 
         Button btn09 = findViewById(R.id.button09);
@@ -153,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clickButton00() {
+        String [] currFiles;
         String nowFile;
         Bitmap inpMap, outMap;
 //                TextView tv = findViewById(R.id.startNumber);
@@ -170,25 +165,21 @@ public class MainActivity extends AppCompatActivity {
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath(), options);
             outMap = removeRedColor(inpMap);
-//            outMap = dumpSourceMap(inpMap);
-            //            tgtMap = srcMap.copy(Bitmap.Config.ARGB_8888, true);
-//            inpMap = BitmapFactory.decodeFile(targetFile.getAbsolutePath(), options);
-//            outMap = dumpSourceMap(outMap);
             outMap = removeBlankNorLine(outMap);
             utils.writeBitMap(outMap, targetFile);
         }
-        tvText1.setText("Done..");
+        tvProgress.setText("Done..");
         utils.appendText("Done");
     }
 
     private void clickDumpSource() {
-        Bitmap inpMap, outMap;
-        Matrix matrix = new Matrix();
+        String [] currFiles;
+        Bitmap inpMap;
         currFiles = utils.getCurrentFileNames(sourceFolder);
         utils.deleteLogFile();
-        for (int idx = 0; idx < currFiles.length; idx++) {
-            nowName = currFiles[idx];
-            tVText2.setText(tVText2.getText().toString()+" "+nowName);
+        for (String currFile : currFiles) {
+            nowName = currFile;
+            tVText2.setText(tVText2.getText().toString() + " " + nowName);
             sourceFile = new File(sourceFolder, nowName);
             targetFile = new File(targetFolder, nowName);
             inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
@@ -200,22 +191,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clickDumpSourcePartial(int xBase, int yBase, int delta) {
+        String [] currFiles;
         Bitmap inpMap;
         currFiles = utils.getCurrentFileNames(sourceFolder);
         utils.deleteLogFile();
-        for (int idx = 0; idx < currFiles.length; idx++) {
-            nowName = currFiles[idx];
-            tVText2.setText(tVText2.getText().toString()+" "+nowName);
+        for (String currFile : currFiles) {
+            nowName = currFile;
+            tVText2.setText(tVText2.getText().toString() + " " + nowName);
             sourceFile = new File(sourceFolder, nowName);
             targetFile = new File(targetFolder, nowName);
             inpMap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
             SourceDump.dumpSourceMapPartial(inpMap, xBase, yBase, delta);
-            tvText1.setText(nowName+" Done..");
-            tvText1.invalidate();
+            tvProgress.setText(nowName + " Done..");
+            tvProgress.invalidate();
         }
         Toast.makeText(mainContext," source partial Dumped (X: "+xBase+", Y: "+yBase+")" ,Toast.LENGTH_LONG).show();
-        utils.sayFinished();
+        utils.dingDone();
     }
+
 
     private Bitmap removeBlankNorLine(Bitmap inpMap) {
         Matrix matrix = new Matrix();
@@ -227,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
 
         for (int yp = 0; yp < ySize; yp++) {
             int nonZero = 0;
-//                        StringBuilder oneLine = new StringBuilder();
             for (int xp = 0; xp < xSize; xp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
                 outMap.setPixel(xp, tgtY, nowColor);
@@ -246,51 +238,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         utils.appendText(  nowName + " x:" + xSize + ", y:" + ySize + " > "+tgtY + " -"+(ySize-tgtY));
-
-//        return outMap;
         return Bitmap.createBitmap(outMap, 0, 0, xSize, tgtY, matrix, false);
-    }
-
-
-    private Bitmap removeLightGrayColor(Bitmap inpMap) {
-        Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
-        int xSize = inpMap.getWidth();
-        int ySize = inpMap.getHeight();
-        int whiteCnt = 0, blackCnt = 0, whiteNear = 0, blackNear = 0, noneCnt = 0;
-
-        for (int yp = 0; yp < ySize; yp++) {
-            for (int xp = 0; xp < xSize; xp++) {
-                int nowColor = inpMap.getPixel(xp, yp);
-
-                if (ColorDetect.isNearWhite(nowColor)) {
-                    nowColor = whiteColor;
-                    whiteNear++;
-                }
-                else if (ColorDetect.isNearBlack(nowColor)) {
-                    nowColor = blackColor;
-                    blackNear++;
-                }
-                else {
-                    int redC = nowColor & 0xFF0000;
-                    int greenC = nowColor & 0xFF00;
-                    int blueC = nowColor & 0xFF;
-
-                    if (redC < 0x800000 & greenC < 0x8000 & blueC < 0x80) {
-                        nowColor = blackColor;
-                        blackCnt++;
-                    } else if (redC > 0xD00000 & greenC > 0xD000 & blueC > 0xD0) {
-                        nowColor = whiteColor;
-                        whiteCnt++;
-                    } else {
-                        nowColor = 0;
-                        noneCnt++;
-                    }
-                }
-                outMap.setPixel(xp, yp, nowColor);
-            }
-        }
-            utils.appendText("whiteCnt="+whiteCnt+" blackCnt="+blackCnt+" whiteNear="+whiteNear+" blackNear="+blackNear+" none="+noneCnt);
-        return outMap;
     }
 
     private Bitmap removeRedColor(Bitmap inpMap) {
@@ -304,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         for (int yp = 110; yp < ySize; yp++) {  // 120 is normal for hymn
             // 110 start : 241, 311 hymn
 
-            StringBuilder oneLine = new StringBuilder();
             for (int xp = 0; xp < xSize; xp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
                 if (ColorDetect.isRedColor(nowColor)) {
@@ -320,13 +267,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (yStart == -1) {
-            yStart = 0;
             outYp = ySize;
             utils.appendText("yStart is Zero "+nowName+" @@@@@@@@@@@@@@@@");
         }
-//        utils.appendText(ySize+" >  "+outYp+" start="+yStart);
         return Bitmap.createBitmap(outMap, 0, 0, xSize, outYp, matrix, false);
     }
-
 }
 

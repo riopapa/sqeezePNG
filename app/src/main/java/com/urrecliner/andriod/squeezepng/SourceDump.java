@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import static com.urrecliner.andriod.squeezepng.Vars.nowName;
 import static com.urrecliner.andriod.squeezepng.Vars.utils;
 
-public class SourceDump {
+class SourceDump {
 
     static Bitmap dumpSourceMap(Bitmap inpMap) {
         int xSize = inpMap.getWidth();
@@ -34,7 +34,6 @@ public class SourceDump {
         utils.appendText("Dump Finish, "+nowName+",_,_,_,_,_,_,_,_,_,_,_,_");
         return outMap;
     }
-
 
     static void dumpSourceMapPartial(Bitmap inpMap, int xBase, int yBase, int delta) {
         utils.appendText("X=,"+xBase+",Y=,"+yBase+",Dump start, "+nowName);

@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.urrecliner.andriod.squeezepng.MainActivity.tvProgress;
 import static com.urrecliner.andriod.squeezepng.Vars.mainContext;
 import static com.urrecliner.andriod.squeezepng.Vars.utils;
 
@@ -115,16 +118,28 @@ class Utils {
             currFiles[i] = currFullFiles[i].getName();
 //        Log.w("Before","sort");
 //        for (int i = 0; i < currFiles.length; i++) Log.w(""+i,currFiles[i]);
-        Arrays.sort(currFiles);
+        return nbrStringSort(currFiles);
 //        Log.w("After","sort");
 //        for (int i = 0; i < currFiles.length; i++) Log.w(""+i,currFiles[i]);
-        return currFiles;
     }
 
     private File[] getCurrentFileList(File fullPath) {
         return fullPath.listFiles();
     }
 
+    String [] nbrStringSort(String [] inp) {
+        int len = inp.length;
+        String [] working = new String [len];
+        String [] result = new String [len];
+        for (int i = 0; i < len; i++)
+            working[i] = "0000".substring(inp[i].length()-5)+inp[i]+";"+inp[i];
+        Arrays.sort(working);
+        for (int i = 0; i < len; i++) {
+            String[] split = working[i].split(";");
+            result[i] = split[1];
+        }
+        return result;
+    }
     void deleteLogFile() {
         File directory = utils.getPackageDirectory();
         File file = new File(directory, PREFIX + dateFormat.format(new Date())+".txt");
@@ -143,10 +158,19 @@ class Utils {
         }
     }
 
-    void sayFinished() {
+    void dingDone() {
         MediaPlayer mp = new MediaPlayer();
         mp = MediaPlayer.create(mainContext, R.raw.inform);
         mp.start();
 
     }
+
+    static Handler showProgress = new Handler() {
+        public void handleMessage(Message msg) {
+            String text =msg.obj.toString();
+            tvProgress.setText(text);
+            tvProgress.invalidate();
+        }
+    };
+
 }
