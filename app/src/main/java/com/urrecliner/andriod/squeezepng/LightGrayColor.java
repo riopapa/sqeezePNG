@@ -16,15 +16,19 @@ import static com.urrecliner.andriod.squeezepng.Vars.utils;
 
 class LightGrayColor {
 
-
+    static String fileHandled;
     static void loop_removeLightGrayColor() {
         String [] currFiles;
         String nowFile;
         Bitmap inpMap, outMap;
         currFiles = utils.getCurrentFileNames(sourceFolder);
+        fileHandled = "";
 
         for (String currFile : currFiles) {
             nowFile = currFile;
+            fileHandled = fileHandled +"\n"+nowFile;
+            Message msgText = Message.obtain(); msgText.obj = fileHandled;
+            showProgress.sendMessage(msgText);
             sourceFile = new File(sourceFolder, nowFile);
             nowName = sourceFile.getName();
             targetFile = new File(targetFolder, nowName);
@@ -42,7 +46,7 @@ class LightGrayColor {
     }
 
     static Bitmap removeLightGrayColor(Bitmap inpMap) {
-        int whiteColor = 0xffffffff, blackColor = 0xff000000;
+        int whiteColor = 0xffffffff, darkColor = 0xff6f6f6f;
 
         Bitmap outMap = inpMap.copy(Bitmap.Config.ARGB_8888, true);
         int xSize = inpMap.getWidth();
@@ -53,30 +57,30 @@ class LightGrayColor {
             for (int xp = 0; xp < xSize; xp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
 
-                if (ColorDetect.isNearWhite(nowColor)) {
-                    nowColor = whiteColor;
-                    whiteNear++;
-                }
-                else if (ColorDetect.isNearBlack(nowColor)) {
-                    nowColor = blackColor;
-                    blackNear++;
-                }
-                else {
+//                if (ColorDetect.isNearWhite(nowColor)) {
+//                    nowColor = whiteColor;
+//                    whiteNear++;
+//                }
+//                else if (ColorDetect.isNearBlack(nowColor)) {
+//                    nowColor = darkColor;
+//                    blackNear++;
+//                }
+//                else {
                     int redC = nowColor & 0xFF0000;
                     int greenC = nowColor & 0xFF00;
                     int blueC = nowColor & 0xFF;
 
-                    if (redC < 0x800000 & greenC < 0x8000 & blueC < 0x80) {
-                        nowColor = blackColor;
+                    if (redC < 0x900000 & greenC < 0x9000 & blueC < 0x90) {
+                        nowColor = darkColor;
                         blackCnt++;
-                    } else if (redC > 0xD00000 & greenC > 0xD000 & blueC > 0xD0) {
+                    } else if (redC > 0xC00000 & greenC > 0xC000 & blueC > 0xC0) {
                         nowColor = whiteColor;
                         whiteCnt++;
                     } else {
                         nowColor = 0;
                         noneCnt++;
                     }
-                }
+//                }
                 outMap.setPixel(xp, yp, nowColor);
             }
         }

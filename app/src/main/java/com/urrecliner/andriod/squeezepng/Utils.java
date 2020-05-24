@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -116,11 +117,8 @@ class Utils {
         String [] currFiles = new String[currFullFiles.length];
         for (int i = 0; i < currFiles.length; i++)
             currFiles[i] = currFullFiles[i].getName();
-//        Log.w("Before","sort");
-//        for (int i = 0; i < currFiles.length; i++) Log.w(""+i,currFiles[i]);
-        return nbrStringSort(currFiles);
-//        Log.w("After","sort");
-//        for (int i = 0; i < currFiles.length; i++) Log.w(""+i,currFiles[i]);
+        return currFiles;
+//        return nbrStringSort(currFiles);
     }
 
     private File[] getCurrentFileList(File fullPath) {
@@ -132,7 +130,7 @@ class Utils {
         String [] working = new String [len];
         String [] result = new String [len];
         for (int i = 0; i < len; i++)
-            working[i] = "0000".substring(inp[i].length()-5)+inp[i]+";"+inp[i];
+            working[i] = "0000".substring(inp[i].length()-4)+inp[i]+";"+inp[i];
         Arrays.sort(working);
         for (int i = 0; i < len; i++) {
             String[] split = working[i].split(";");
@@ -159,8 +157,7 @@ class Utils {
     }
 
     void dingDone() {
-        MediaPlayer mp = new MediaPlayer();
-        mp = MediaPlayer.create(mainContext, R.raw.inform);
+        MediaPlayer mp = MediaPlayer.create(mainContext, R.raw.inform);
         mp.start();
 
     }
@@ -168,6 +165,7 @@ class Utils {
     static Handler showProgress = new Handler() {
         public void handleMessage(Message msg) {
             String text =msg.obj.toString();
+            Toast.makeText(mainContext, text, Toast.LENGTH_SHORT).show();
             tvProgress.setText(text);
             tvProgress.invalidate();
         }

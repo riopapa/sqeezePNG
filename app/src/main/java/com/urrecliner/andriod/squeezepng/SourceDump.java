@@ -21,7 +21,7 @@ class SourceDump {
                 if (nowColor == 0) {
                     oneLine.append(",");
                 } else if (nowColor == 0xff000000) {
-                    oneLine.append(",");
+                    oneLine.append("_,");
                 } else {
                     oneLine.append(String.format("#%08X", nowColor & 0xffffffff));
                     oneLine.append(",");
@@ -36,7 +36,7 @@ class SourceDump {
     }
 
     static void dumpSourceMapPartial(Bitmap inpMap, int xBase, int yBase, int delta) {
-        utils.appendText("X=,"+xBase+",Y=,"+yBase+",Dump start, "+nowName);
+        utils.appendText("X="+xBase+",Y="+yBase+", delta="+delta+", Dump start, ");
         for (int yp = yBase; yp < yBase + delta; yp++) {
             StringBuilder oneLine = new StringBuilder();
             for (int xp = xBase; xp < xBase+delta; xp++) {
@@ -54,11 +54,11 @@ class SourceDump {
                 if (nowColor == 0) {
                     oneLine.append(",");
                 } else if (nowColor == 0xff000000) {
-                    oneLine.append("XX,");
+                    oneLine.append("_,");
                 } else if (nowColor == 0xffffffff) {
-                    oneLine.append(",");
+                    oneLine.append("@,");
                 } else {
-                    oneLine.append(String.format("#%08X", nowColor & 0xffffffff));
+                    oneLine.append(String.format("#%06X", nowColor & 0xffffff));
                     oneLine.append(",");
                 }
 //                outMap.setPixel(xp, tgtY, nowColor);

@@ -49,12 +49,12 @@ class VerticalDup {
         int ySize = inpMap.getHeight();
         int tgtX = 80;
 
-        for (int xp = 80; xp < xSize-1; xp++) {
+        for (int xp = 0; xp < xSize-1; xp++) {
             int diffCount = 0;
             for (int yp = 0; yp < ySize; yp++) {
                 int nowColor = inpMap.getPixel(xp, yp);
                 int rightColor = inpMap.getPixel(xp+1, yp);
-                outMap.setPixel(tgtX, yp, nowColor);
+                outMap.setPixel(xp, yp, nowColor);
                 if (nowColor != rightColor)
                     diffCount++;
             }
@@ -68,5 +68,4 @@ class VerticalDup {
         utils.appendText(  nowName + " x:" + xSize  + " > "+tgtX + " -"+(xSize-tgtX));
         return Bitmap.createBitmap(outMap, 0, 0, tgtX, ySize, matrix, false);
     }
-
 }
