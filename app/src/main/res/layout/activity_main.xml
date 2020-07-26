@@ -44,7 +44,7 @@
         android:inputType="number"
         android:textAllCaps="false"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toRightOf="@id/input2"
         app:layout_constraintTop_toBottomOf="@id/text3" />
 
     <EditText
